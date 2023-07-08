@@ -5,7 +5,7 @@ import shubh.springframework.reactivemongo.model.BeerDTO;
 
 public interface BeerService {
 
-    Mono<BeerDTO> saveBeer(BeerDTO beerDTO);
+    Mono<BeerDTO> saveBeer(Mono<BeerDTO> beerDTO);
 
     Mono<BeerDTO> getById(String beerId);
 
