@@ -6,7 +6,7 @@ import shubh.springframework.reactivemongo.model.CustomerDTO;
 
 @Mapper
 public interface CustomerMapper {
-    Customer CustomerDtoToCustomer(CustomerDTO customerDTO);
+    Customer customerDtoToCustomer(CustomerDTO customerDTO);
 
-    CustomerDTO CustomerToCustomerDto(Customer customer);
+    CustomerDTO customerToCustomerDto(Customer customer);
 }

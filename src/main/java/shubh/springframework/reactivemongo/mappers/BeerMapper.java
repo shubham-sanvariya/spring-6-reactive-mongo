@@ -6,7 +6,7 @@ import shubh.springframework.reactivemongo.model.BeerDTO;
 
 @Mapper
 public interface BeerMapper {
-    Beer BeerDtoToBeer(BeerDTO beerDTO);
+    Beer beerDtoToBeer(BeerDTO beerDTO);
 
-    BeerDTO BeerToBeerDto(Beer beer);
+    BeerDTO beerToBeerDto(Beer beer);
 }
