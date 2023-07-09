@@ -9,6 +9,8 @@ public interface BeerService {
 
     Mono<BeerDTO> findFirstByBeerName(String beerName);
 
+    Flux<BeerDTO> findByBeerStyle(String beerStyle);
+
 
     Flux<BeerDTO> listBeers();
 
