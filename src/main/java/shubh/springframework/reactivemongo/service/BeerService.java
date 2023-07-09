@@ -2,9 +2,13 @@ package shubh.springframework.reactivemongo.service;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import shubh.springframework.reactivemongo.domain.Beer;
 import shubh.springframework.reactivemongo.model.BeerDTO;
 
 public interface BeerService {
+
+    Mono<BeerDTO> findFirstByBeerName(String beerName);
+
 
     Flux<BeerDTO> listBeers();
 
