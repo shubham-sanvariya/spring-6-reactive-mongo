@@ -10,7 +10,9 @@ import shubh.springframework.reactivemongo.mappers.BeerMapper;
 import shubh.springframework.reactivemongo.model.BeerDTO;
 
 import java.math.BigDecimal;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -30,13 +32,17 @@ class BeerServiceImplTest {
 
     @Test
     void saveBeer() throws InterruptedException{
+
+        AtomicBoolean atomicBoolean  = new AtomicBoolean(false);
+
         Mono<BeerDTO> savedMono = beerService.saveBeer(Mono.just(beerDTO));
 
         savedMono.subscribe(savedDto -> {
             System.out.println(savedDto.getId());
+            atomicBoolean.set(true);
         });
 
-        Thread.sleep(1000l);
+        await().untilTrue(atomicBoolean);
     }
 
     public static Beer getTestBeer() {
