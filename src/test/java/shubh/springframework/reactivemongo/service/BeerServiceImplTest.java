@@ -39,6 +39,22 @@ class BeerServiceImplTest {
     }
 
     @Test
+    void findFirstByBeerName() {
+        BeerDTO beerDTO  = getsavedBeerDto();
+
+        AtomicBoolean atomicBoolean = new AtomicBoolean(false);
+
+        Mono<BeerDTO> foundDto = beerService.findFirstByBeerName(beerDTO.getBeerName());
+
+        foundDto.subscribe(dto -> {
+            System.out.println(dto.toString());
+            atomicBoolean.set(true);
+        });
+
+        await().untilTrue(atomicBoolean);
+    }
+
+    @Test
     @DisplayName("Test save Beer using subscriber")
     void saveBeer() throws InterruptedException{
 
@@ -103,7 +119,7 @@ class BeerServiceImplTest {
 
     @Test
     void testDeleteBeer() {
-        BeerDTO beerToDelete = savedBeerDto();
+        BeerDTO beerToDelete = getsavedBeerDto();
 
         beerService.deleteBeerById(beerToDelete.getId()).block();
 
@@ -126,7 +142,7 @@ class BeerServiceImplTest {
 
     }
 
-    public  BeerDTO savedBeerDto() {
+    public  BeerDTO getsavedBeerDto() {
         return beerService.saveBeer(Mono.just(getTestBeerDto())).block();
     }
 
