@@ -24,6 +24,18 @@ class BeerEndPointTest {
     WebTestClient webTestClient;
 
     @Test
+    void testCreateBeer() {
+        BeerDTO beerDTO = getSavedTestBeer();
+
+        webTestClient.post().uri(BeerRouterConfig.BEER_PATH)
+                .body(Mono.just(beerDTO), BeerDTO.class)
+                .header("Content-type","application/json")
+                .exchange()
+                .expectStatus().isCreated()
+                .expectHeader().exists("location");
+    }
+
+    @Test
     void testGetById() {
         BeerDTO beerDTO = getSavedTestBeer();
 
