@@ -1,6 +1,9 @@
 package shubh.springframework.reactivemongo.web_fn;
 
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,8 +17,8 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.*;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest
 @AutoConfigureWebTestClient
 class BeerEndPointTest {
@@ -24,12 +27,29 @@ class BeerEndPointTest {
     WebTestClient webTestClient;
 
     @Test
+    void testDeleteBeerNotFound() {
+        webTestClient.delete()
+                .uri(BeerRouterConfig.BEER_PATH_ID,999)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
     void testDeleteBeer() {
         BeerDTO beerDTO = getSavedTestBeer();
 
         webTestClient.delete().uri(BeerRouterConfig.BEER_PATH_ID, beerDTO.getId())
                 .exchange()
                 .expectStatus().isNoContent();
+    }
+
+    @Test
+    void testPatchIdNotFound() {
+        webTestClient.patch()
+                .uri(BeerRouterConfig.BEER_PATH_ID, 999)
+                .body(Mono.just(BeerServiceImplTest.getTestBeer()), BeerDTO.class)
+                .exchange()
+                .expectStatus().isNotFound();
     }
 
     @Test
@@ -44,6 +64,16 @@ class BeerEndPointTest {
     }
 
     @Test
+    void testUpdateBeerNotFound() {
+        webTestClient.put()
+                .uri(BeerRouterConfig.BEER_PATH_ID, 999)
+                .body(Mono.just(BeerServiceImplTest.getTestBeer()), BeerDTO.class)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    @Order(3)
     void testUpdateBeer() {
         BeerDTO beerDTO = getSavedTestBeer();
         beerDTO.setBeerName("new");
@@ -67,6 +97,14 @@ class BeerEndPointTest {
     }
 
     @Test
+    void testGetByIdNotFound() {
+        webTestClient.get().uri(BeerRouterConfig.BEER_PATH_ID, 999)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    @Order(1)
     void testGetById() {
         BeerDTO beerDTO = getSavedTestBeer();
 
@@ -75,6 +113,16 @@ class BeerEndPointTest {
                 .expectStatus().isOk()
                 .expectHeader().valueEquals("content-type","application/json")
                 .expectBody(BeerDTO.class);
+    }
+
+    @Test
+    @Order(2)
+    void listBeers() {
+        webTestClient.get().uri(BeerRouterConfig.BEER_PATH)
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().valueEquals("Content-type", "application/json")
+                .expectBody().jsonPath("$.size()",hasSize(greaterThan(1)));
     }
 
     public BeerDTO getSavedTestBeer() {
@@ -91,14 +139,5 @@ class BeerEndPointTest {
                 .exchange()
                 .returnResult(BeerDTO.class)
                 .getResponseBody().blockFirst();
-    }
-
-    @Test
-    void listBeers() {
-        webTestClient.get().uri(BeerRouterConfig.BEER_PATH)
-                .exchange()
-                .expectStatus().isOk()
-                .expectHeader().valueEquals("Content-type", "application/json")
-                .expectBody().jsonPath("$.size()",hasSize(greaterThan(1)));
     }
 }
