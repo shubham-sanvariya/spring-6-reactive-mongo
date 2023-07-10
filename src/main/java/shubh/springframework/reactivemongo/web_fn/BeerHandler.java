@@ -15,6 +15,13 @@ public class BeerHandler {
 
     private final BeerService beerService;
 
+    public Mono<ServerResponse> deleteBeerById(ServerRequest request) {
+        return beerService.deleteBeerById(request.pathVariable("beerId"))
+                // then method is used because this is going to take action
+                // when that mono void & also to see if an exception comes up
+                .then(ServerResponse.noContent().build());
+    }
+
     public Mono<ServerResponse> patchBeerById(ServerRequest request) {
         return request.bodyToMono(BeerDTO.class)
                 .map(beerDTO -> beerService
