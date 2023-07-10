@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import shubh.springframework.reactivemongo.model.BeerDTO;
 import shubh.springframework.reactivemongo.service.BeerService;
@@ -13,6 +14,15 @@ import shubh.springframework.reactivemongo.service.BeerService;
 public class BeerHandler {
 
     private final BeerService beerService;
+
+    public Mono<ServerResponse> createNewBeer(ServerRequest request){
+        return beerService.saveBeer(request.bodyToMono(BeerDTO.class))
+                // using flatmap because when we saveBeer it returns a publisher
+                .flatMap(beerDTO -> ServerResponse.created(UriComponentsBuilder
+                        .fromPath(BeerRouterConfig.BEER_PATH_ID)
+                        .build(beerDTO.getId()))
+                        .build());
+    }
 
     public Mono<ServerResponse> getBeerById(ServerRequest request) {
         return ServerResponse.ok()
